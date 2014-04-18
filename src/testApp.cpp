@@ -1,9 +1,4 @@
-/* This is an example of how to integrate maximilain into openFrameworks, 
- including using audio received for input and audio requested for output.
- 
- 
- You can copy and paste this and use it as a starting example.
- 
+/*  Weidong Yang 2014-04-17
  */
 
 
