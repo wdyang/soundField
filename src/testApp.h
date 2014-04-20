@@ -2,9 +2,13 @@
 
 #include "ofMain.h"
 #include "ofxMaxim.h"
+#include "ofxOsc.h"
 
 #define numTracks 8
-
+#define numChannels 2
+#define HOST "localhost"
+#define PORT_FROM_IPAD 8000
+#define PORT_TO_IPAD  9000
 
 class testApp : public ofBaseApp{
 
@@ -34,11 +38,24 @@ class testApp : public ofBaseApp{
 		/* stick you maximilian stuff below */
 	
         double samples[8], volume[8], length[8], freq[8];
+    double rotate = 0;
 //        double wave,sample,outputs[2], sample2, outputs2[2], sample3, sample4, sample5, sample6, sample7, sample8;
 		ofxMaxiMix mymix;
 		ofxMaxiOsc sine1;
         ofxMaxiSample tracks[8];
 //		ofxMaxiSample beats,beat, beat2, beat3, beat4, beat5, beat6, beat7, beat8;
 	
-		
+    //osc stuff
+    ofxOscReceiver ipadReceiver;
+    ofxOscSender    ipadSender;
+    string ipadIP;
+    bool    bSenderLive;
+    
+    void parseIpadOSCMessage();
+    void oscSendInitConfig();
+    void oscSendInt(const string &address, int msg);
+    void oscSendFloat(const string &address, float msg);
+    void oscSendFormatedFloat(const string &address, float msg, int precision); //precision is the number of decimal points
+    void oscSendString(const string &address, const string &msg);
+
 };

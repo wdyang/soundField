@@ -47,25 +47,24 @@ void testApp::setup(){
         freq[i]=sampleRate*1.0/length[i];
         volume[i]=1.0;
     }
-//    beat.load(ofToDataPath("STE-000.wav"));
-//    beat2.load(ofToDataPath("Loop 1 Dramatic Accent.wav"));
-//    beat3.load(ofToDataPath("Loop 4 Walkie Talkie.wav"));
-//    beat4.load(ofToDataPath("Clapping.wav"));
-//    beat5.load(ofToDataPath("Loop 7 Morse Code.wav"));
-//    beat.getLength();
-//    beat2.getLength();
-//    beat3.getLength();
-//    beat4.getLength();
-//    beat5.getLength();
     
-	
-//	ofSoundStreamSetup(2,0,this, sampleRate, initialBufferSize, 4);/* Call this last ! */
-	ofSoundStreamSetup(8,0,this, sampleRate, initialBufferSize, 16);/* Call this last ! */
+	if(numChannels==2){
+        ofSoundStreamSetup(2,0,this, sampleRate, initialBufferSize, 4);/* Call this last ! */
+    }else{
+        ofSoundStreamSetup(8,0,this, sampleRate, initialBufferSize, 16);/* Call this last ! */
+    }
+    
+    //    Setup TouchOSC
+    ipadReceiver.setup(PORT_FROM_IPAD);
+
 }
 
 //--------------------------------------------------------------
 void testApp::update(){
-	
+    while(ipadReceiver.hasWaitingMessages()){
+        parseIpadOSCMessage();
+    }
+
 }
 
 //--------------------------------------------------------------
@@ -129,9 +128,17 @@ void testApp::audioRequested 	(float * output, int bufferSize, int nChannels){
 //		output[i*nChannels + 1] = outputs[1];
 //		output[i*nChannels + 2 ] = outputs2[0]; /* You may end up with lots of outputs. add them here */
 //		output[i*nChannels + 3] = outputs2[1];
-
-        for(int j=0; j<numTracks; j++){
-            output[i*nChannels + j] = samples[j]*volume[j];
+        int shift1 = floor(rotate);
+        double weight2 = rotate - shift1;
+        double weight1 = 1.0 - weight2;
+        
+        for(int j=0; j<numChannels; j++){
+            int track1 = j + shift1;
+            int track2 = j+ shift1 + 1;
+            if (track1 >7) track1 = 0;
+            if (track2 > 7) track2 = 0;
+            output[i*nChannels + j] = weight1 * samples[track1]*volume[track1] + weight2 * samples[track2]*volume[track2];
+//            output[i*nChannels + j] = samples[j]*volume[j];
         }
 //		output[i*nChannels    ] = sample; /* You may end up with lots of outputs. add them here */
 //		output[i*nChannels + 1] = sample2;
